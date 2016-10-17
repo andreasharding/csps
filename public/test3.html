@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Civil Service People Survey</title>
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="stylesheets/style.css">
+<style>
+label {
+    font: 12px sans-serif;
+}
+.node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+.node {
+    font: 10px sans-serif;
+}
+.link {
+    fill: none;
+    stroke: tan;
+    stroke-width: 1.5px;
+}
+</style>
+</head>
+<body>
+<script src="js/jquery-2.2.1.min.js">
+</script>
+<script src="js/bootstrap.min.js">
+</script>
+<!-- 
+<script src="js/knockout-3.4.0.js">
+</script>
+<script src="js/simple_statistics.min.js">
+</script>
+ -->
+<script src="js/d3.min.js">
+</script>
+<script src="js/d3-hierarchy.v0.2.min.js">
+</script>
+<!-- 
+<script src="js/queue.v1.min.js">
+</script>
+<script src="js/moment.min.js">
+</script>
+ -->
+<!-- 
+<script src="javascripts/csps.js">
+</script>
+ -->
+<script>
+
+$(function() {
+	console.log('ready!');
+
+
+// $( "#cm_btn" ).on( "click", function( event ) {
+// 	console.log('cm_btn clicked!');
+// });
+
+
+var cluster_width = 500,
+    cluster_height = 500;
+var diameter = 300;
+var duration = 2000;
+var data_id = 0;
+
+d3.selectAll("input").on("change", change);
+
+d3.select("#cm_btn").on("click", function( event ) {
+	console.log('cm_btn clicked!');
+});
+
+function change() {
+	console.log('change clicked: ' + this.value);
+    if (this.value === "radialtree")
+        transitionToRadialTree();
+    else if (this.value === "radialcluster")
+        transitionToRadialCluster();
+    else if (this.value === "tree")
+        transitionToTree();
+    else
+        transitionToCluster();
+};
+
+/*
+function transitionToRadialTree() {
+
+    var nodes = radialTree.nodes(root), // recalculate layout
+        links = radialTree.links(nodes);
+    
+    svg.transition().duration(duration)
+        .attr("transform", "translate(" + (cluster_width/2) + "," +
+                                          (cluster_height/2) + ")");
+        // set appropriate translation (origin in middle of svg)
+    
+    link.data(links)
+        .transition()
+        .duration(duration)
+        .style("stroke", "#fc8d62")
+        .attr("d", radialDiagonal); //get the new radial path
+
+    node.data(nodes)
+        .transition()
+        .duration(duration)
+        .attr("transform", function(d) {
+            return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")";
+        });
+    
+    node.select("circle")
+        .transition()
+        .duration(duration)
+        .style("stroke", "#984ea3");
+    
+};
+*/
+
+function transitionToRadialCluster() {
+	root = getData();
+    var nodes = radialCluster.nodes(root), // recalculate layout
+        links = radialCluster.links(nodes);
+    
+    svg.transition().duration(duration)
+        .attr("transform", "translate(" + (cluster_width/2) + "," +
+                                          (cluster_height/2) + ")");
+        // set appropriate translation (origin in middle of svg)
+    
+    link.data(links)
+        .transition()
+        .duration(duration)
+        .style("stroke", "#66c2a5")
+        .attr("d", radialDiagonal); //get the new radial path
+
+    node.data(nodes)
+        .transition()
+        .duration(duration)
+        .attr("transform", function(d) {
+            return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")";
+        });
+    
+    node.select("circle")
+        .transition()
+        .duration(duration)
+        .style("stroke", "#4daf4a");
+
+};
+
+/*
+function transitionToTree() {
+    
+    var nodes = tree.nodes(root), //recalculate layout
+        links = tree.links(nodes);
+
+    svg.transition().duration(duration)
+        .attr("transform", "translate(40,0)");
+        
+    link.data(links)
+        .transition()
+        .duration(duration)
+        .style("stroke", "#e78ac3")
+        .attr("d", diagonal); // get the new tree path
+
+    node.data(nodes)
+        .transition()
+        .duration(duration)
+        .attr("transform", function (d) {
+            return "translate(" + d.y + "," + d.x + ")";
+        });
+    
+    node.select("circle")
+        .transition()
+        .duration(duration)
+        .style("stroke", "#377eb8");
+
+};
+*/
+
+function transitionToCluster() {
+    root = getData();
+    var nodes = cluster.nodes(root), //recalculate layout
+        links = cluster.links(nodes);
+    
+    svg.transition().duration(duration)
+        .attr("transform", "translate(40,0)");
+  
+    link.data(links)
+        .transition()
+        .duration(duration)
+        .style("stroke", "#8da0cb")
+        .attr("d", diagonal); //get the new cluster path
+
+    node.data(nodes)
+        .transition()
+        .duration(duration)
+        .attr("transform", function (d) {
+            return "translate(" + d.y + "," + d.x + ")";
+        });
+    
+    node.select("circle")
+        .transition()
+        .duration(duration)
+        .style("stroke", "#e41a1c");
+    
+};
+
+
+var root; // store data in a variable accessible by all functions
+
+// var tree = d3.layout.tree()
+//     .size([cluster_height, cluster_width - 160]);
+
+var cluster = d3.layout.cluster()
+    .size([cluster_height, cluster_width - 160]);
+
+var diagonal = d3.svg.diagonal()
+    .projection(function (d) {
+    return [d.y, d.x];
+});
+
+// var radialTree = d3.layout.tree()
+//     .size([360, diameter / 2 ])
+//     .separation(function(a, b) {
+//         return (a.parent == b.parent ? 1 : 2) / a.depth;
+//     });
+
+var radialCluster = d3.layout.cluster()
+    .size([360, diameter / 2 ])
+    .separation(function(a, b) {
+        return (a.parent == b.parent ? 1 : 2) / a.depth;
+    });
+
+var radialDiagonal = d3.svg.diagonal.radial()
+    .projection(function(d) {
+        return [d.y, d.x / 180 * Math.PI];
+    });
+
+
+var svg = d3.select("#d3_svg").append("svg")
+    .attr("width", cluster_width)
+    .attr("height", cluster_height)
+    .append("g")
+    .attr("transform", "translate(40,0)");
+
+    var root = getData(),
+        nodes = cluster.nodes(root),
+        links = cluster.links(nodes);
+
+    var link = svg.selectAll(".link")
+        .data(links)
+       .enter()
+        .append("path")
+        .attr("class", "link")
+        .style("stroke", "#8da0cb")
+        .attr("d", diagonal);
+
+    var node = svg.selectAll(".node")
+        .data(nodes)
+       .enter()
+        .append("g")
+        .attr("class", "node")
+        .attr("transform", function (d) {
+        return "translate(" + d.y + "," + d.x + ")";
+    })
+
+    node.append("circle")
+        .attr("r", 4.5)
+        .style("stroke", "#e41a1c");
+/*
+    node.append("text")
+        .attr("dx", function (d) { return d.children ? -8 : 8; })
+        .attr("dy", 3)
+        .style("text-anchor", function (d) { return d.children ? "end" : "start"; })
+        .text(function (d) { return d.name; });
+*/
+
+
+
+function objectify(cluster_array, n_clusters) {
+	var clusters = [{"org": "ALL_CS", year: '', headcount: '', "cluster": '', "org_ac": '', "par_ac": ''}], i = 0;
+	while (i < n_clusters) {
+		clusters.push({"org": i++, year: '', headcount: '', "cluster": "ALL_CS", "org_ac": '', "par_ac": ''});
+	}
+	cluster_array.forEach(function (e) {
+		clusters.push({"org": e[0], year: e[1], headcount: e[2], "cluster": e[3], "org_ac": e[4], "par_ac": e[5]});
+	});
+	return clusters;
+}
+
+
+function getData() {
+	var data, n_clusters;
+	if (data_id==0) {
+		data_id = 1;
+		n_clusters = 4;
+		data = [["Advisory Conciliation and Arbitration Service",2014,830,2,"ACAS","BIS"],["Attorney General's Office",2014,40,3,"AGO","CS"],["Business, Innovation and Skills (excl. agencies) ",2014,3080,2,"BIS","CS"],["Cabinet Office (excl. agencies)",2014,2030,2,"CO","CS"],["Centre for Environment Fisheries and Aquaculture Science",2014,560,2,"CEFAS","DEFRA"],["Charity Commission ",2014,330,1,"CC","CS"],["Companies House ",2014,950,2,"CH","BIS"],["Crown Office and Procurator Fiscal Service",2014,1700,1,"COPFS","SG"],["Crown Prosecution Service",2014,6660,1,"CPS","AGO"],["Crown Prosecution Service Inspectorate",2014,30,2,"HMCPSI","AGO"],["Debt Management Office",2014,110,0,"DMO","HMT"],["Defence Science and Technology Laboratory",2014,3830,1,"DSTL","MOD"],["Defence Support Group",2014,2430,1,"DSG","MOD"],["Department for Communities and Local Government (excl. agencies)",2014,1680,2,"DCLG","CS"],["Department for Culture Media and Sport",2014,390,2,"DCMS","CS"],["Department for Education",2014,2290,2,"DFE","CS"],["Department for Environment Food and Rural Affairs (excl. agencies)",2014,2070,2,"DEFRA","CS"],["Department for International Development",2014,1900,0,"DFID","CS"],["Department for Transport (excl. agencies)",2014,1850,2,"DFT","CS"],["Department for Work and Pensions",2014,95920,2,"DWP","CS"],["Department of Energy and Climate Change",2014,1570,2,"DECC","CS"],["Department of Health (excl. agencies) ",2014,1920,2,"DH","CS"],["Disclosure Scotland",2014,210,2,"DS","SG"],["Driver and Vehicle Licensing Agency",2014,5570,2,"DVLA","DFT"],["ESTYN ",2014,110,3,"ESTYN","NAW"],["Education Scotland",2014,260,2,"ES","SG"],["FCO Services",2014,960,1,"FCOS","FCO"],["Food Standards Agency",2014,1270,1,"FSA","CS"],["Food and Environment Research Agency",2014,840,1,"FERA","DEFRA"],["Foreign and Commonwealth Office (excl. agencies)",2014,4610,0,"FCO","CS"],["Government Actuary's Department",2014,160,2,"GAD","HMT"],["HM Revenue and Customs",2014,69310,1,"HMRC","CS"],["HM Treasury",2014,1220,0,"HMT","CS"],["Her Majesty's Courts and Tribunals Service",2014,18820,2,"HMCTS","MOJ"],["Her Majesty's Passport Office",2014,3770,2,"HMPO","HO"],["Highways Agency",2014,3480,1,"HA","DFT"],["Historic Scotland",2014,1040,2,"HS","SG"],["Home Office (excl. agencies)",2014,23520,2,"HO","CS"],["Insolvency Service",2014,1820,2,"INSS","BIS"],["Land Registry",2014,4400,1,"LR","BIS"],["Legal Aid Agency",2014,1500,3,"LAA","MOJ"],["Maritime and Coastguard Agency",2014,1070,1,"MCA","DFT"],["Medicines and Healthcare Products Regulatory Agency",2014,1220,2,"MHRA","DH"],["Met Office",2014,2030,0,"MET","BIS"],["Ministry of Defence",2014,48540,1,"MOD","CS"],["Ministry of Justice (excl. agencies) ",2014,4220,2,"MOJ","CS"],["National Archives",2014,620,0,"TNA","MOJ"],["National Crime Agency",2014,4170,1,"NCA","CS"],["National Measurement Office",2014,80,0,"NMO","BIS"],["National Offender Management Service",2014,37220,2,"NOMS","MOJ"],["National Records of Scotland",2014,390,1,"NRS","SG"],["National Savings and Investments",2014,170,0,"NSANDI","HMT"],["Office for Standards in Education, Children's Services and Skills",2014,1270,2,"OFSTED","DFE"],["Office of Accountant in Bankruptcy",2014,140,0,"AIB","SG"],["Office of Gas and Electricity Markets",2014,850,2,"OFGEM","BIS"],["Office of Rail Regulation",2014,280,0,"ORR","DFT"],["Office of the Public Guardian",2014,620,2,"OPG","MOJ"],["Office of the Scottish Charity Regulator",2014,50,2,"OSCR","SG"],["Ordnance Survey ",2014,1180,0,"OS","BIS"],["Planning Inspectorate",2014,800,2,"PINS","DCLG"],["Public Health England",2014,5420,1,"PHE","DH"],["Registers of Scotland ",2014,930,2,"ROS","SG"],["Royal Parks",2014,110,0,"TRP","DCMS"],["Rural Payments Agency",2014,2110,1,"RPA","DEFRA"],["Scottish Court Service",2014,1490,2,"SCS","SG"],["Scottish Government (excl. agencies)",2014,5300,2,"SG","SG"],["Scottish Housing Regulator",2014,50,3,"SHR","SG"],["Scottish Prison Service ",2014,4500,1,"SPS","SG"],["Scottish Public Pensions Agency",2014,280,2,"SPPA","SG"],["Serious Fraud Office",2014,320,2,"SFO","AGO"],["Skills Funding Agency",2014,1270,2,"SFA","BIS"],["Student Awards Agency",2014,220,2,"SAAS","SG"],["The Health and Safety Executive",2014,3300,1,"HSE","DWP"],["Transport Scotland",2014,400,0,"TS","SG"],["Treasury Solicitor",2014,1260,2,"TSOL","AGO"],["UK Export Finance",2014,230,2,"UKEF","CS"],["UK Hydrographic Office",2014,1080,1,"UKHO","MOD"],["United Kingdom Statistics Authority",2014,3660,3,"UKSA","CS"],["Valuation Office",2014,3760,1,"VOA","HMRC"],["Vehicle Certification Agency",2014,160,2,"VCA","DFT"],["Veterinary Medicines Directorate ",2014,160,0,"VMD","DEFRA"],["Welsh Government",2014,5690,2,"WG","NAW"],["Wilton Park Executive Agency",2014,70,0,"WPEA","FCO"]];
+	} else {
+		data_id = 0;
+		n_clusters = 7;
+		data = [["Advisory Conciliation and Arbitration Service",2014,830,5,"ACAS","BIS"],["Attorney General's Office",2014,40,4,"AGO","CS"],["Business, Innovation and Skills (excl. agencies) ",2014,3080,3,"BIS","CS"],["Cabinet Office (excl. agencies)",2014,2030,3,"CO","CS"],["Centre for Environment Fisheries and Aquaculture Science",2014,560,3,"CEFAS","DEFRA"],["Charity Commission ",2014,330,2,"CC","CS"],["Companies House ",2014,950,5,"CH","BIS"],["Crown Office and Procurator Fiscal Service",2014,1700,2,"COPFS","SG"],["Crown Prosecution Service",2014,6660,1,"CPS","AGO"],["Crown Prosecution Service Inspectorate",2014,30,3,"HMCPSI","AGO"],["Debt Management Office",2014,110,0,"DMO","HMT"],["Defence Science and Technology Laboratory",2014,3830,2,"DSTL","MOD"],["Defence Support Group",2014,2430,1,"DSG","MOD"],["Department for Communities and Local Government (excl. agencies)",2014,1680,3,"DCLG","CS"],["Department for Culture Media and Sport",2014,390,3,"DCMS","CS"],["Department for Education",2014,2290,6,"DFE","CS"],["Department for Environment Food and Rural Affairs (excl. agencies)",2014,2070,3,"DEFRA","CS"],["Department for International Development",2014,1900,6,"DFID","CS"],["Department for Transport (excl. agencies)",2014,1850,3,"DFT","CS"],["Department for Work and Pensions",2014,95920,3,"DWP","CS"],["Department of Energy and Climate Change",2014,1570,3,"DECC","CS"],["Department of Health (excl. agencies) ",2014,1920,3,"DH","CS"],["Disclosure Scotland",2014,210,5,"DS","SG"],["Driver and Vehicle Licensing Agency",2014,5570,5,"DVLA","DFT"],["ESTYN ",2014,110,4,"ESTYN","NAW"],["Education Scotland",2014,260,6,"ES","SG"],["FCO Services",2014,960,2,"FCOS","FCO"],["Food Standards Agency",2014,1270,2,"FSA","CS"],["Food and Environment Research Agency",2014,840,2,"FERA","DEFRA"],["Foreign and Commonwealth Office (excl. agencies)",2014,4610,3,"FCO","CS"],["Government Actuary's Department",2014,160,5,"GAD","HMT"],["HM Revenue and Customs",2014,69310,1,"HMRC","CS"],["HM Treasury",2014,1220,0,"HMT","CS"],["Her Majesty's Courts and Tribunals Service",2014,18820,3,"HMCTS","MOJ"],["Her Majesty's Passport Office",2014,3770,5,"HMPO","HO"],["Highways Agency",2014,3480,2,"HA","DFT"],["Historic Scotland",2014,1040,2,"HS","SG"],["Home Office (excl. agencies)",2014,23520,2,"HO","CS"],["Insolvency Service",2014,1820,3,"INSS","BIS"],["Land Registry",2014,4400,1,"LR","BIS"],["Legal Aid Agency",2014,1500,6,"LAA","MOJ"],["Maritime and Coastguard Agency",2014,1070,2,"MCA","DFT"],["Medicines and Healthcare Products Regulatory Agency",2014,1220,2,"MHRA","DH"],["Met Office",2014,2030,0,"MET","BIS"],["Ministry of Defence",2014,48540,2,"MOD","CS"],["Ministry of Justice (excl. agencies) ",2014,4220,3,"MOJ","CS"],["National Archives",2014,620,0,"TNA","MOJ"],["National Crime Agency",2014,4170,1,"NCA","CS"],["National Measurement Office",2014,80,0,"NMO","BIS"],["National Offender Management Service",2014,37220,6,"NOMS","MOJ"],["National Records of Scotland",2014,390,1,"NRS","SG"],["National Savings and Investments",2014,170,0,"NSANDI","HMT"],["Office for Standards in Education, Children's Services and Skills",2014,1270,6,"OFSTED","DFE"],["Office of Accountant in Bankruptcy",2014,140,0,"AIB","SG"],["Office of Gas and Electricity Markets",2014,850,3,"OFGEM","BIS"],["Office of Rail Regulation",2014,280,0,"ORR","DFT"],["Office of the Public Guardian",2014,620,5,"OPG","MOJ"],["Office of the Scottish Charity Regulator",2014,50,6,"OSCR","SG"],["Ordnance Survey ",2014,1180,0,"OS","BIS"],["Planning Inspectorate",2014,800,6,"PINS","DCLG"],["Public Health England",2014,5420,2,"PHE","DH"],["Registers of Scotland ",2014,930,5,"ROS","SG"],["Royal Parks",2014,110,0,"TRP","DCMS"],["Rural Payments Agency",2014,2110,1,"RPA","DEFRA"],["Scottish Court Service",2014,1490,5,"SCS","SG"],["Scottish Government (excl. agencies)",2014,5300,6,"SG","SG"],["Scottish Housing Regulator",2014,50,4,"SHR","SG"],["Scottish Prison Service ",2014,4500,1,"SPS","SG"],["Scottish Public Pensions Agency",2014,280,5,"SPPA","SG"],["Serious Fraud Office",2014,320,5,"SFO","AGO"],["Skills Funding Agency",2014,1270,6,"SFA","BIS"],["Student Awards Agency",2014,220,5,"SAAS","SG"],["The Health and Safety Executive",2014,3300,1,"HSE","DWP"],["Transport Scotland",2014,400,0,"TS","SG"],["Treasury Solicitor",2014,1260,3,"TSOL","AGO"],["UK Export Finance",2014,230,3,"UKEF","CS"],["UK Hydrographic Office",2014,1080,2,"UKHO","MOD"],["United Kingdom Statistics Authority",2014,3660,4,"UKSA","CS"],["Valuation Office",2014,3760,1,"VOA","HMRC"],["Vehicle Certification Agency",2014,160,6,"VCA","DFT"],["Veterinary Medicines Directorate ",2014,160,0,"VMD","DEFRA"],["Welsh Government",2014,5690,6,"WG","NAW"],["Wilton Park Executive Agency",2014,70,6,"WPEA","FCO"]];
+	}
+	
+	return root = d3_hierarchy.stratify()
+		.id(function(d) { return  d.org; })
+		.parentId(function(d) { return d.cluster; })
+		(objectify(data, n_clusters));			
+}
+
+
+});
+</script>
+
+
+<div class="container-fluid">
+<div class="row">
+<div class="col-md-1">
+</div>
+<div class="col-md-11">
+<h2>Civil Service People Survey</h2>
+
+<form>
+<!--   <label><input type="radio" name="mode" value="radialtree">Radial Tree</label> -->
+  <label><input type="radio" name="mode" value="radialcluster">Radial Cluster 1</label>
+  <label><input type="radio" name="mode" value="radialcluster">Radial Cluster 2</label>
+<!-- 
+  <label><input type="radio" name="mode" value="tree">Tree</label>
+ -->
+  <label><input type="radio" name="mode" value="cluster" checked>Cluster 1</label>
+  <label><input type="radio" name="mode" value="cluster" checked>Cluster 2</label>
+</form>
+<button id="cm_btn" class="btn">click me</button>
+
+
+<div id="d3_svg"></div>
+
+</div>
+</div>
+
+</div>
+from http://jsfiddle.net/VividD/2Gcrd/
+</body>
+</html>

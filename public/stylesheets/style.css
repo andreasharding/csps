@@ -1,0 +1,74 @@
+body {
+  padding: 40px;
+  font: 14px Lato, Helvetica, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+#first_row {
+  margin-top: 20px;
+}
+
+
+@font-face {
+    font-family: 'simplifica';
+    src: url('../fonts/simplifica_typeface-webfont.eot');
+    src: url('../fonts/simplifica_typeface-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/simplifica_typeface-webfont.woff2') format('woff2'),
+         url('../fonts/simplifica_typeface-webfont.woff') format('woff'),
+         url('../fonts/simplifica_typeface-webfont.ttf') format('truetype'),
+         url('../fonts/simplifica_typeface-webfont.svg#simplificasimplifica') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+.simple {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  font-family: 'simplifica';
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#ncluster_sel, #algo_sel, #cluster_update, #features_sel, 
+#vis_sel, #org_sel, #year_sel, #org_sel2, #year_sel2  {
+	display: inline;
+}
+
+#ncluster_sel {width:60px;}
+#year_sel, #year_sel2 {width:100px;}
+#org_sel, #org_sel2 {width:240px;}
+#algo_sel, #features_sel, #vis_sel {width:120px;}
+#cluster_update {width:120px;}
+
+.small_menu {
+	font-size: 10px;
+	padding: 2px 4px;
+	width:120px;
+}
+
+/* 
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+ */
+
+.node {
+  font: 10px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}

@@ -1,0 +1,393 @@
+extends layout
+
+block content
+	.container-fluid
+		.row
+			.col-md-1
+			.col-md-10
+				h2= title
+					span :&nbsp;
+					span(data-bind="text: current_organisation")
+					span &nbsp;
+					span(data-bind="text: current_year")
+			.col-md-1
+				.form-group(id="org_year_sel_top")
+					select(class="form-control small_menu" id="org_sel_top" data-bind="options: organisations, value: current_organisation, event:{ change: $root.organisation_changed}")
+					select(class="form-control small_menu" id="year_sel_top" data-bind="options: survey_years, value: current_year")
+		.row(id="first_row")
+			.col-md-1
+			.col-md-7
+				ul(class="nav nav-pills")
+					li(class="active")
+						a(data-toggle="pill" href="#intro") Intro
+					
+					li(class="dropdown")
+						a(class="dropdown-toggle" data-toggle="dropdown" href="#") Comparisons
+							span(class="caret")
+							ul(class="dropdown-menu")
+								li
+									a(data-toggle="pill" href="#compare_suggest") Let system suggest comparison group
+								li
+									a(data-toggle="pill" href="#compare_choose") Choose group to compare with
+								li
+									a(data-toggle="pill" href="#compare_self") Compare self over time
+					
+					li(class="dropdown")
+						a(class="dropdown-toggle" data-toggle="dropdown" href="#") Explore
+							span(class="caret")
+							ul(class="dropdown-menu")
+								li
+									a(data-toggle="pill" href="#dash_overview") Overview
+								li
+									a(data-toggle="pill" href="#dash_performance") Performance
+								// li
+									a(data-toggle="pill" href="#dash_profile") Profile
+								li
+									a(data-toggle="pill" href="#dash_demographics") Demographics
+								// li
+									a(data-toggle="pill" href="#dash_sentiment") Bullying, Harassment and Discrimination
+						
+					li(class="dropdown")
+						a(class="dropdown-toggle" data-toggle="dropdown" href="#") Test
+							span(class="caret")
+							ul(class="dropdown-menu")
+								li
+									a(data-toggle="pill" href="#test_clusters") Clusters
+						
+			.col-md-1
+			.col-md-1
+			.col-md-1
+			.col-md-1
+		.row
+			.col-md-1
+			.col-md-10
+				span &nbsp;
+			.col-md-1
+
+		.tab-content
+			div(id="intro" class="tab-pane fade in active")
+				.row
+					.col-md-1
+					.col-md-10
+						.well
+							h3 Compare
+							.container-fluid
+								.col-md-4 Compare to similar/other organisations, or  compare with previous results.
+								.col-md-4 First, select the main organisation, and the year:
+									.form-group(id="org_year_sel")
+										select(class="form-control" id="org_sel" data-bind="options: organisations, value: current_organisation")
+										select(class="form-control" id="year_sel" data-bind="options: survey_years, value: current_year")
+								.col-md-4 <a href="#compare_suggest" data-toggle="pill" id="suggest_link">Suggest comparison group <span class="glyphicon glyphicon-arrow-right"></span></a><br /><a href="#compare_choose" data-toggle="pill">Let me choose other organisations <span class="glyphicon glyphicon-arrow-right"></span></a><br /><a href="#compare_self" data-toggle="pill">Compare own results over time <span class="glyphicon glyphicon-arrow-right"></span></a>
+					.col-md-1
+				.row
+					.col-md-1
+					.col-md-10
+						.well
+							h3 Explore
+							.container-fluid
+								.col-md-4
+									span Interactive exploration of the data.
+								.col-md-4
+									a(data-toggle="pill" href="#dash_overview") Overview <span class="glyphicon glyphicon-arrow-right"></span>
+									br
+									a(data-toggle="pill" href="#dash_demographics") Demographics <span class="glyphicon glyphicon-arrow-right"></span>
+									br
+									a(data-toggle="pill" href="#dash_performance") Performance <span class="glyphicon glyphicon-arrow-right"></span>
+									br
+									a(data-toggle="pill" href="#dash_profile") Profile <span class="glyphicon glyphicon-arrow-right"></span>
+									br
+									a(data-toggle="pill" href="#dash_sentiment") Bullying, Harassment and Discrimination <span class="glyphicon glyphicon-arrow-right"></span>
+								.col-md-4
+					.col-md-1
+
+			div(id="dash_overview" class="tab-pane fade in")
+				.row
+					.col-md-1
+					.col-md-3
+						h3 Overview
+							span : #{organisation}
+					.col-md-3
+					.col-md-3
+					.col-md-1
+			
+				.row
+					.col-md-4
+						h4 Drivers of engagement
+					.col-md-4
+						h4 Annual change in headcount
+					.col-md-4
+						h4 Demographics overview
+				.row
+					.col-md-4
+						#engagement_drivers
+					.col-md-4
+						#headcount_change_chart
+					.col-md-1
+						#demographics_overview_gender
+					.col-md-1
+						#demographics_overview_ethnicity
+					.col-md-1
+						#demographics_overview_sexuality
+					.col-md-1
+				.row
+					.col-md-4
+						h4 Bullying & Harassment
+					.col-md-4
+						h4 Discrimination
+					.col-md-4
+						h4 Wellbeing
+				.row
+					.col-md-4
+						#bullying_harassment_chart
+					.col-md-4
+						#discrimination_chart
+					.col-md-4
+						#wellbeing_chart
+			
+			div(id="dash_performance" class="tab-pane fade in")
+				.row
+					.col-md-1
+					.col-md-10
+						h3 Drivers of engagement and comparison with top and average performers
+						#engagement_drivers_detail
+					.col-md-1
+			
+			div(id="dash_profile" class="tab-pane fade in")
+				.row
+					.col-md-1
+					.col-md-3
+						h3 Profile
+					.col-md-3
+					.col-md-3
+					.col-md-1
+			
+			div(id="dash_demographics" class="tab-pane fade in")
+				.row
+					.col-md-1
+					.col-md-3
+						h3 Demographics
+					.col-md-3
+					.col-md-3
+					.col-md-1
+				.row
+					.col-md-1
+					.col-md-2
+						#demographics_charts_01
+					.col-md-2
+						#demographics_charts_02
+					.col-md-2
+						#demographics_charts_03
+					.col-md-2
+						#demographics_charts_04
+					.col-md-2
+						#demographics_charts_05
+					.col-md-1
+				.row
+					.col-md-1
+					.col-md-2
+						#demographics_charts_06
+					.col-md-2
+						#demographics_charts_07
+					.col-md-2
+						#demographics_charts_08
+					.col-md-2
+						#demographics_charts_09
+					.col-md-2
+						#demographics_charts_10
+					.col-md-1
+				.row
+					.col-md-1
+					.col-md-2
+						#demographics_charts_11
+					.col-md-2
+						#demographics_charts_12
+					.col-md-2
+						#demographics_charts_13
+					.col-md-2
+						#demographics_charts_14
+					.col-md-2
+						#demographics_charts_15
+					.col-md-1
+				.row
+					.col-md-1
+					.col-md-2
+						#demographics_charts_16
+					.col-md-2
+						#demographics_charts_17
+					.col-md-2
+						#demographics_charts_18
+					.col-md-2
+						#demographics_charts_19
+					.col-md-2
+						#demographics_charts_20
+					.col-md-1
+				.row
+					.col-md-1
+					.col-md-2
+						#demographics_charts_21
+					.col-md-2
+						#demographics_charts_22
+					.col-md-2
+						#demographics_charts_23
+					.col-md-2
+						#demographics_charts_24
+					.col-md-2
+						#demographics_charts_25
+					.col-md-1
+			
+			div(id="dash_sentiment" class="tab-pane fade in")
+				.row
+					.col-md-1
+					.col-md-3
+						h3 Bullying, Harassment and Discrimination
+					.col-md-3
+					.col-md-3
+					.col-md-1
+				.row
+					.col-md-1
+					.col-md-9
+						#sentiment_chart
+					.col-md-1
+
+			div(id="story" class="tab-pane fade in")
+				.row
+					.col-md-1
+					.col-md-3
+						h3 What&rsquo;s the story?
+					.col-md-3
+					.col-md-3
+					.col-md-1
+				.row
+					.col-md-1
+					.col-md-3
+						h4 Going well
+					.col-md-3
+						h4 Needs improvement
+					.col-md-3
+					.col-md-1
+
+			div(id="compare_suggest" class="tab-pane fade in")
+				.row
+					.col-md-1
+					.col-md-9
+						h3 Some suggested organisations to benchmark against
+					.col-md-1
+				.row
+					.col-md-1
+					.col-md-2
+					.col-md-2
+					.col-md-7
+				.row
+					.col-md-12
+						div(id="comparison_similar_orgs")
+
+			div(id="compare_choose" class="tab-pane fade in")
+				.row
+					.col-md-1
+					.col-md-10
+						h3 Choose organisations to benchmark against
+					.col-md-1
+				.row
+					.col-md-1
+					.col-md-10
+						form(data-bind="foreach: organisations")
+							div
+								input(type="checkbox" data-bind="value: $data; checked: current_cluster;")
+								span(data-bind="text: $data")
+					.col-md-1
+						div(id="comparison_own_choice_orgs")
+							form(data-bind="foreach: current_cluster")
+								li(data-bind="text: $data")
+
+						
+
+			div(id="compare_self" class="tab-pane fade in")
+				.row
+					.col-md-1
+					.col-md-3
+						h3 Compare organisation over time
+					.col-md-3
+					.col-md-3
+					.col-md-1
+				.row
+					.col-md-1
+					.col-md-3
+						div(id="comparison_self_time_EEI")
+					.col-md-3
+						div(id="comparison_self_time_themes")
+					.col-md-3
+						div(id="comparison_self_time_demographics")
+					.col-md-1
+
+
+
+
+
+			div(id="interventions" class="tab-pane fade in")
+				.row
+					.col-md-1
+					.col-md-3
+						h3 What interventions worked?
+					.col-md-3
+					.col-md-3
+					.col-md-1
+				.row
+					.col-md-1
+					.col-md-3
+						h4 Previous actions plans
+							p show history of previous action plans...
+					.col-md-3
+						h4 Did they work?
+					.col-md-3
+					.col-md-1
+
+			div(id="actions" class="tab-pane fade in")
+				.row
+					.col-md-1
+					.col-md-3
+						h3 What do I need to do now?
+					.col-md-3
+					.col-md-3
+					.col-md-1
+				.row
+					.col-md-1
+					.col-md-3
+						h4 Drivers of engagement
+							p Colour coded list of drivers of engagement table.
+							p Don't use the signal strength indicator - it's meaningless and confusing.
+					.col-md-3
+					.col-md-3
+					.col-md-1
+
+
+
+			div(id="test_clusters" class="tab-pane fade in")
+				.row
+					.col-md-1
+					.col-md-9
+						h3 Some suggested organisations to benchmark against
+					.col-md-1
+				.row
+					.col-md-1
+					.col-md-2
+							span time = 
+							span(data-bind="text: delivery_time") 
+							span ms
+					.col-md-2
+							span silhouette = 
+							span(data-bind="text: silhouette_score")
+					.col-md-7
+						div
+							span(data-bind="text: status_message")
+						.form-groups
+							<!-- input(id="ncluster_sel" type="text" class="form-control" data-bind="value: num_clusters") -->
+							<!-- select(id="algo_sel" class="form-control" data-bind="options: cluster_algorithms, value: current_algorithm") -->
+							select(id="vis_sel" class="form-control" data-bind="options: visualisation_styles, value: visualisation_style")
+							select(id="features_sel" class="form-control" data-bind="options: feature_sets, value: current_feature_set")
+							button(id="cluster_update" class="btn" data-bind="click: update_clusters") update clusters
+							<!-- .form-group(id="org_year_sel2") -->
+							<!-- select(class="form-control" id="org_sel2" data-bind="options: organisations, value: current_organisation") -->
+							<!-- select(class="form-control" id="year_sel2" data-bind="options: survey_years, value: current_year") -->
+				.row
+					.col-md-12
+						div(id="cluster_test")
